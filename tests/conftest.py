@@ -6,4 +6,4 @@ from whats_about import app as quart_app
 async def _app():
     app = quart_app  # Initialize app
     async with app.test_app() as test_app:
-        yield test_app
+        return test_app

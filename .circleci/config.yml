@@ -38,7 +38,7 @@ jobs:
       - run:
           name: Run tests
           # This assumes pytest is installed via the install-package step above
-          command: pytest
+          command: pytest --cov-report xml --cov=./
           
       - codecov/upload:
           file: coverage.xml 
