@@ -1,8 +1,13 @@
+from links_manager import get_redis_pool
 from quart import Quart
 from crawler import bulk_crawl_and_write
 import pathlib
 
 app = Quart(__name__)
+
+app_config = {
+    'redis_db': 'redis://localhost/0',
+}
 
 
 @app.route('/')
@@ -16,12 +21,10 @@ async def start_crawling():
     with open(here.joinpath("urls.txt"), 'r') as infile:
         urls = set(map(str.strip, infile))
 
-    outpath = here.joinpath("foundurls.txt")
-    await bulk_crawl_and_write(file=outpath, urls=urls)
+    redis_pool = get_redis_pool(app_config['redis_db'])
+    await bulk_crawl_and_write(urls=urls, redis_pool=redis_pool)
 
-    with open(outpath, 'r') as outfile:
-        res = list(map(str.strip, outfile))
-    return res
+    return 'Done'
 
 if __name__ == '__main__':
     app.run()
