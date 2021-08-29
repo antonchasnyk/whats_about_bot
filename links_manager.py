@@ -24,10 +24,10 @@ async def add_new_url_to_db(url: str, pub_date: datetime,
                                             'pub_date': date_str,
                                             'visit': 0,
                                             })
-        await redis_pool.expire(key, 60)  # TODO remove in prodaction
+        await redis_pool.expire(key, 86400)  # Store URL for one day
 
 
-def get_redis_pool(db_url: str) -> Redis:
+def get_redis_pool(db_url: str, **kwargs) -> Redis:
     """Return Redis pool by connection string
 
     Args:
@@ -37,5 +37,5 @@ def get_redis_pool(db_url: str) -> Redis:
         Redis: redis_pool for use store function
     """
     return aioredis.from_url(
-        db_url, encoding="utf-8", decode_responses=True
+        db_url, encoding="utf-8", decode_responses=True, **kwargs
     )

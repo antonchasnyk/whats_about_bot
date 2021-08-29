@@ -4,6 +4,7 @@ from links_manager import get_redis_pool
 from quart import Quart
 from crawler import extract_feed_urls
 import pathlib
+import os
 
 
 logging.basicConfig(
@@ -14,21 +15,22 @@ logging.basicConfig(
 )
 
 app = Quart(__name__)
+app_config = {}
+try:
+    app_config['redis_url'] = os.environ['REDIS_URL']
+except KeyError:
+    app_config['redis_url'] = 'redis://localhost'
 
-app_config = {
-    'redis_link_cache': 'redis://localhost/0',
-}
 
-
-@app.route('/')
+@ app.route('/')
 async def info():
     return 'Whats About Config'
 
 
-@app.route('/walk')
+@ app.route('/walk')
 async def start_crawling():
     here = pathlib.Path(__file__).parent
-    redis_pool = get_redis_pool(app_config['redis_link_cache'])
+    redis_pool = get_redis_pool(app_config['redis_url'], db=0)
     with open(here.joinpath("feeds.txt"), 'r') as infile:
         urls = set(map(str.strip, infile))
 
